@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Christian McTighe">
+    <title>News Feedr</title>
+
+    <!-- Fonts -->
+    <script src="https://use.fontawesome.com/981382a342.js"></script>
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-social/5.0.0/bootstrap-social.css">
+
+    <!-- CSS stylesheet -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- AngularJS -->
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+
+    <!-- Angular and JavaScript scripts -->
+    <script src="js/app.js"></script>
+    <script src="js/scripts.js"></script>
+  </head>
+
+  <body ng-app="newsArticles">
+
+    <!-- Top Section -->
+    <section class="top" ng-controller="DateCtrl">
+      <div class="container">
+        <h4>{{ date | date:'fullDate' }}</h4>
+      </div>
+    </section>
+
+    <!-- Header -->
+    <header class="top-header">
+      <div class="header-content">
+        <br>
+        <h1>News Feedr</h1>
+      </div>
+    </header>
+
+    <!-- Main Section -->
+    <section class="main" ng-controller="ArticlesCtrl">
+      <div class="container-fluid">
+      <br>
+
+        <div class="row">
+          <div class="col-md-4 col-sm-8 col-xs-12">
+            <div class="sidebar">
+              <!-- Search Field -->
+              <br>
+              <form class="form-group">
+                <div class="input-group">
+                  <div class="input-group-addon"><span class="glyphicon glyphicon-search"></span></div>
+                  <input type="text" class="form-control" placeholder="Enter search keyword" ng-model="articleSearch">
+                </div>
+              </form>
+
+              <!-- News Article Feed Selection -->
+              <br>
+              <div class="btn-group">
+                <button class="btn btn-warning news-button" type="button" tabindex="-1">{{ articleLoadButton }}</button>
+                <button class="btn btn-warning dropdown-toggle" data-toggle="dropdown" tabindex="-1">
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a href="#" ng-click="feedSrc='http://feeds.abcnews.com/abcnews/topstories';loadArticles($event);">ABC</a></li>
+                  <li><a href="#" ng-click="feedSrc='http://hosted.ap.org/lineups/TOPHEADS.rss?SITE=AP&SECTION=HOME';loadArticles($event);">Associated Press (AP)</a></li>
+                  <li><a href="#" ng-click="feedSrc='http://feeds.bbci.co.uk/news/rss.xml';loadArticles($event);">BBC</a></li>
+                  <li><a href="#" ng-click="feedSrc='http://rss.cnn.com/rss/cnn_topstories.rss';loadArticles($event);">CNN</a></li>
+                  <li><a href="#" ng-click="feedSrc='http://www.dailymail.co.uk/articles.rss';loadArticles($event);">Daily Mail</a></li>
+                  <li><a href="#" ng-click="feedSrc='http://www.huffingtonpost.com/feeds/verticals/huffpost-home/index.xml';loadArticles($event)">Huffington Post</a></li>
+                  <li><a href="#" ng-click="feedSrc='http://www.independent.co.uk/news/world/rss';loadArticles($event)">The Independent</a></li>
+                  <li><a href="#" ng-click="feedSrc='http://www.latimes.com/world/rss2.0.xml';loadArticles($event)">LA Times</a></li>
+                  <li><a href="#" ng-click="feedSrc='http://www.nbcnewyork.com/news/top-stories/?rss';loadArticles($event)">NBC</a></li>
+                  <li><a href="#" ng-click="feedSrc='http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml';loadArticles($event);">New York Times</a></li>
+                  <li><a href="#" ng-click="feedSrc='http://feeds.reuters.com/reuters/topNews';loadArticles($event);">Reuters</a></li>
+                  <li><a href="#" ng-click="feedSrc='http://feeds.skynews.com/feeds/rss/home.xml';loadArticles($event);">Sky News</a></li>
+                  <li><a href="#" ng-click="feedSrc='http://www.usnews.com/rss/news';loadArticles($event);">US News</a></li>
+                  <li><a href="#" ng-click="feedSrc='http://feeds.washingtonpost.com/rss/world';loadArticles($event);">Washington Post</a></li>
+                  <li><a href="#" ng-click="feedSrc='http://www.yahoo.com/news/rss';loadArticles($event);">Yahoo</a></li>
+                </ul>
+              </div><!-- end of .btn-group -->
+
+            </div><!-- end of .sidebar -->
+          </div><!-- end of .col-md-4 -->
+
+          <!-- Articles Display Section -->
+          <div class="col-md-8 col-xs-12">
+            <div class="article-listing">
+              <h2>{{ title }}</h2>
+              <hr>
+              <br>
+              <p id="no-articles-message"><i>Please choose news feed (on left), to view articles.</i></p>
+
+              <div ng-show="articles.length > 0"><p>There are <b>{{ ( articles | filter:articleSearch).length }}</b> articles</p></div>
+
+              <div ng-repeat="article in articles | filter:articleSearch | orderBy:'publishedDate':true | limitTo: viewLimit">
+
+                <div class="article-box">
+                  <h3><a href="{{ article.link }}" target="_blank">{{ article.title }}</a></h3>
+                  <p><i>{{ article.publishedDate }}</i></p>
+                  <p>{{ article.contentSnippet }}</p>
+                </div>
+
+              </div><!-- end of ng-repeat -->
+
+              <br>
+              <button ng-click="viewMore(5)" ng-hide="viewLimit >= articles.length" class="btn btn-warning" id="view-more-button">View More</button>
+
+            </div><!-- end of .article-listing -->
+          </div><!-- end of .col-md-8 -->
+        </div><!-- end of .row -->
+
+      </div><!-- end of .container-fluid -->
+      <div class="extra-space"></div>
+
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <div class="row">
+
+          <div class="copyright">
+            <p>Coded by Hand.<br>
+            2016, Christian McTighe.</p>
+          </div>
+
+        </div><!-- end of .row -->
+      </div><!-- end of .container -->
+
+    </footer>
+
+  </body>
+
+</html>

@@ -1,0 +1,24 @@
+{
+  "name": "news-feedr",
+  "version": "1.0.0",
+  "description": "A small RSS news feed page",
+  "private": false,
+  "author": "Christian McTighe",
+  "repository": "https://github.com/mctighecw/news-feedr.git",
+  "url": "http://news-feedr.heroku.com",
+  "license": "OPL-1.0",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "devDependencies": {
+  },
+  "engines": {
+    "node": "4.4.7",
+    "npm": "2.15.8"
+  },
+  "dependencies": {
+    "bower": "1.7.1",
+    "express": "4.13.3"
+  },
+  "cacheDirectories": ["node_modules"]
+}

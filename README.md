@@ -15,7 +15,7 @@ Email: mctighecw@gmail.com
 
 GitHub: [Link](https://github.com/mctighecw/news-feedr.git)
 
-Productions site: [On Heroku](https://newsfeedr.herokuapp.com/)
+Production site: [On Heroku](https://newsfeedr.herokuapp.com/)
 
 ## Notes
 

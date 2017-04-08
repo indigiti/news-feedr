@@ -78,21 +78,21 @@
                   <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
-                  <li><a href="#" ng-click="feedSrc='http://feeds.abcnews.com/abcnews/topstories';loadArticles($event);">ABC</a></li>
-                  <li><a href="#" ng-click="feedSrc='http://hosted.ap.org/lineups/TOPHEADS.rss?SITE=AP&SECTION=HOME';loadArticles($event);">Associated Press (AP)</a></li>
-                  <li><a href="#" ng-click="feedSrc='http://feeds.bbci.co.uk/news/rss.xml';loadArticles($event);">BBC</a></li>
-                  <li><a href="#" ng-click="feedSrc='http://rss.cnn.com/rss/cnn_topstories.rss';loadArticles($event);">CNN</a></li>
-                  <li><a href="#" ng-click="feedSrc='http://www.dailymail.co.uk/articles.rss';loadArticles($event);">Daily Mail</a></li>
-                  <li><a href="#" ng-click="feedSrc='http://www.huffingtonpost.com/feeds/verticals/huffpost-home/index.xml';loadArticles($event)">Huffington Post</a></li>
-                  <li><a href="#" ng-click="feedSrc='http://www.independent.co.uk/news/world/rss';loadArticles($event)">The Independent</a></li>
-                  <li><a href="#" ng-click="feedSrc='http://www.latimes.com/world/rss2.0.xml';loadArticles($event)">LA Times</a></li>
-                  <li><a href="#" ng-click="feedSrc='http://www.nbcnewyork.com/news/top-stories/?rss';loadArticles($event)">NBC</a></li>
-                  <li><a href="#" ng-click="feedSrc='http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml';loadArticles($event);">New York Times</a></li>
-                  <li><a href="#" ng-click="feedSrc='http://feeds.reuters.com/reuters/topNews';loadArticles($event);">Reuters</a></li>
-                  <li><a href="#" ng-click="feedSrc='http://feeds.skynews.com/feeds/rss/home.xml';loadArticles($event);">Sky News</a></li>
-                  <li><a href="#" ng-click="feedSrc='http://www.usnews.com/rss/news';loadArticles($event);">US News</a></li>
-                  <li><a href="#" ng-click="feedSrc='http://feeds.washingtonpost.com/rss/world';loadArticles($event);">Washington Post</a></li>
-                  <li><a href="#" ng-click="feedSrc='http://www.yahoo.com/news/rss';loadArticles($event);">Yahoo</a></li>
+                  <li><a href="#" ng-click="loadArticles($event,'http://feeds.abcnews.com/abcnews/topstories')">ABC</a></li>
+                  <li><a href="#" ng-click="loadArticles($event,'http://hosted.ap.org/lineups/TOPHEADS.rss?SITE=AP&SECTION=HOME');">Associated Press (AP)</a></li>
+                  <li><a href="#" ng-click="loadArticles($event,'http://feeds.bbci.co.uk/news/rss.xml');">BBC</a></li>
+                  <li><a href="#" ng-click="loadArticles($event,'http://rss.cnn.com/rss/cnn_topstories.rss');">CNN</a></li>
+                  <li><a href="#" ng-click="loadArticles($event,'http://www.dailymail.co.uk/articles.rss');">Daily Mail</a></li>
+                  <li><a href="#" ng-click="loadArticles($event,'http://www.huffingtonpost.com/feeds/verticals/huffpost-home/index.xml')">Huffington Post</a></li>
+                  <li><a href="#" ng-click="loadArticles($event,'http://www.independent.co.uk/news/world/rss')">The Independent</a></li>
+                  <li><a href="#" ng-click="loadArticles($event,'http://www.latimes.com/world/rss2.0.xml')">LA Times</a></li>
+                  <li><a href="#" ng-click="loadArticles($event,'http://www.nbcnewyork.com/news/top-stories/?rss')">NBC</a></li>
+                  <li><a href="#" ng-click="loadArticles($event,'http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml');">New York Times</a></li>
+                  <li><a href="#" ng-click="loadArticles($event,'http://feeds.reuters.com/reuters/topNews');">Reuters</a></li>
+                  <li><a href="#" ng-click="loadArticles($event,'http://feeds.skynews.com/feeds/rss/home.xml');">Sky News</a></li>
+                  <li><a href="#" ng-click="loadArticles($event,'http://www.usnews.com/rss/news');">US News</a></li>
+                  <li><a href="#" ng-click="loadArticles($event,'http://feeds.washingtonpost.com/rss/world');">Washington Post</a></li>
+                  <li><a href="#" ng-click="loadArticles($event,'http://www.yahoo.com/news/rss');">Yahoo</a></li>
                 </ul>
               </div><!-- end of .btn-group -->
 
@@ -105,22 +105,38 @@
               <h2>{{ title }}</h2>
               <hr>
               <br>
-              <p id="no-articles-message"><i>Please choose news feed (on left), to view articles.</i></p>
+              <div ng-if="!articles">
+                <p><i>Please choose a news feed, to view some articles.</i></p>
+              </div>
 
-              <div ng-show="articles.length > 0"><p>There are <b>{{ ( articles | filter:articleSearch).length }}</b> articles</p></div>
+              <div ng-if="filteredArticles.length === 0">
+                <p>Sorry, no articles found</p>
+              </div>
 
-              <div ng-repeat="article in articles | filter:articleSearch | orderBy:'publishedDate':true | limitTo: viewLimit">
+              <div ng-if="filteredArticles.length === 1">
+                <p>There is <b>1</b> article</p>
+              </div>
+
+              <div ng-if="filteredArticles.length > 1">
+                <p>There are <b>{{ filteredArticles.length }}</b> articles</p>
+              </div>
+
+              <div ng-repeat="article in filteredArticles = (articles | filter:articleSearch) | orderBy:'pubDate':true | limitTo: viewLimit">
 
                 <div class="article-box">
                   <h3><a href="{{ article.link }}" target="_blank">{{ article.title }}</a></h3>
-                  <p><i>{{ article.publishedDate }}</i></p>
-                  <p>{{ article.contentSnippet }}</p>
+                  <div ng-if="article.pubDate">
+                    <p><i>{{ article.pubDate | dateFormat }}</i></p>
+                  </div>
+                  <p>{{ article.description }}</p>
                 </div>
 
               </div><!-- end of ng-repeat -->
 
               <br>
-              <button ng-click="viewMore(5)" ng-hide="viewLimit >= articles.length" class="btn btn-warning" id="view-more-button">View More</button>
+              <div ng-if="filteredArticles.length > viewLimit">
+                <button ng-click="viewMore(5)" class="btn btn-warning">View More</button>
+              </div>
 
             </div><!-- end of .article-listing -->
           </div><!-- end of .col-md-8 -->
@@ -138,7 +154,7 @@
 
           <div class="copyright">
             <p>Coded by Hand.<br>
-            2016, Christian McTighe.</p>
+            2017, Christian McTighe.</p>
           </div>
 
         </div><!-- end of .row -->

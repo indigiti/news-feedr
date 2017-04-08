@@ -9,16 +9,25 @@ app.controller('DateCtrl', ['$scope', function($scope) {
   $scope.date = new Date();
 }]);
 
-app.controller('ArticlesCtrl', ['$scope','ArticleService', function($scope, Article) {  
+app.controller('ArticlesCtrl', ['$scope', '$http', function($scope, $http) {
   $scope.title = "Latest News Articles";
   $scope.articleLoadButton = "Choose News Feed";
 
-  $scope.loadArticles = function(e) {        
-    Article.parseArticles($scope.feedSrc).then(function(res) {
-      $scope.articleLoadButton = angular.element(e.target).text();
-      $scope.articles = res.data.responseData.feed.entries;
-      $("#no-articles-message").hide();
-      $("#view-more-button").show();
+  $scope.loadArticles = function(e, url) {
+    $scope.articleLoadButton = angular.element(e.target).text();
+
+    // RSS to JSON converter API
+    $http({
+      url: 'https://api.rss2json.com/v1/api.json',
+      method: 'GET',
+      dataType: 'json',
+      params: {
+        rss_url: url
+      }
+    }).then(function successCallback(response) {
+      $scope.articles = response.data.items;
+    }, function errorCallback(response) {
+      alert('Sorry, there was a problem loading the news feed.');
     });
   }
 
@@ -29,10 +38,10 @@ app.controller('ArticlesCtrl', ['$scope','ArticleService', function($scope, Arti
   }
 }]);
 
-app.factory('ArticleService',['$http', function($http) {
-  return {
-    parseArticles : function(url){
-      return $http.jsonp('//ajax.googleapis.com/ajax/services/feed/load?v=1.0&num=50&callback=JSON_CALLBACK&q=' + encodeURIComponent(url));
-    }
+// Date format filter
+app.filter('dateFormat', function dateFormat($filter) {
+  return function(text) {
+    var newDate = new Date(text.replace(/-/g, '/'));
+    return $filter('date')(newDate, 'longDate');
   }
-}]);
+});
